@@ -1,7 +1,7 @@
 "use strict";
 
-var Widget = require('./widget').Widget,
-    util = require('../util');
+var Widget = require("./widget").Widget,
+    util = require("../util");
 
 var $ = util.$;
 var _t = util.gettext;
@@ -9,27 +9,26 @@ var Promise = util.Promise;
 
 var NS = "annotator-editor";
 
-
 // id returns an identifier unique within this session
-var id = (function () {
+var id = (function() {
     var counter;
     counter = -1;
-    return function () {
-        return counter += 1;
+    return function() {
+        return (counter += 1);
     };
-}());
-
+})();
 
 // preventEventDefault prevents an event's default, but handles the condition
 // that the event is null or doesn't have a preventDefault function.
 function preventEventDefault(event) {
-    if (typeof event !== 'undefined' &&
+    if (
+        typeof event !== "undefined" &&
         event !== null &&
-        typeof event.preventDefault === 'function') {
+        typeof event.preventDefault === "function"
+    ) {
         event.preventDefault();
     }
 }
-
 
 // dragTracker is a function which allows a callback to track changes made to
 // the position of a draggable "handle" element.
@@ -46,7 +45,10 @@ function preventEventDefault(event) {
 // the movement is not tracked, then the amount the mouse has moved will be
 // accumulated and passed to the next mousemove event.
 //
-var dragTracker = exports.dragTracker = function dragTracker(handle, callback) {
+var dragTracker = (exports.dragTracker = function dragTracker(
+    handle,
+    callback
+) {
     var lastPos = null,
         throttled = false;
 
@@ -65,7 +67,7 @@ var dragTracker = exports.dragTracker = function dragTracker(handle, callback) {
         // The callback function can return false to indicate that the tracker
         // shouldn't keep updating the last position. This can be used to
         // implement "walls" beyond which (for example) resizing has no effect.
-        if (typeof callback === 'function') {
+        if (typeof callback === "function") {
             trackLastMove = callback(delta);
         }
 
@@ -78,15 +80,17 @@ var dragTracker = exports.dragTracker = function dragTracker(handle, callback) {
 
         // Throttle repeated mousemove events
         throttled = true;
-        setTimeout(function () { throttled = false; }, 1000 / 60);
+        setTimeout(function() {
+            throttled = false;
+        }, 1000 / 60);
     }
 
     // Event handler for mouseup
     function mouseUp() {
         lastPos = null;
         $(handle.ownerDocument)
-            .off('mouseup', mouseUp)
-            .off('mousemove', mouseMove);
+            .off("mouseup", mouseUp)
+            .off("mousemove", mouseMove);
     }
 
     // Event handler for mousedown -- starts drag tracking
@@ -101,22 +105,21 @@ var dragTracker = exports.dragTracker = function dragTracker(handle, callback) {
         };
 
         $(handle.ownerDocument)
-            .on('mouseup', mouseUp)
-            .on('mousemove', mouseMove);
+            .on("mouseup", mouseUp)
+            .on("mousemove", mouseMove);
 
         e.preventDefault();
     }
 
     // Public: turn off drag tracking for this dragTracker object.
     function destroy() {
-        $(handle).off('mousedown', mouseDown);
+        $(handle).off("mousedown", mouseDown);
     }
 
-    $(handle).on('mousedown', mouseDown);
+    $(handle).on("mousedown", mouseDown);
 
-    return {destroy: destroy};
-};
-
+    return { destroy: destroy };
+});
 
 // resizer is a component that uses a dragTracker under the hood to track the
 // dragging of a handle element, using that motion to resize another element.
@@ -135,9 +138,9 @@ var dragTracker = exports.dragTracker = function dragTracker(handle, callback) {
 //             returns a truthy value, the vertical sense of the drag will be
 //             inverted. Useful if the drag handle is at the bottom of the
 //             element, and so dragging down means "grow the element"
-var resizer = exports.resizer = function resizer(element, handle, options) {
+var resizer = (exports.resizer = function resizer(element, handle, options) {
     var $el = $(element);
-    if (typeof options === 'undefined' || options === null) {
+    if (typeof options === "undefined" || options === null) {
         options = {};
     }
 
@@ -147,10 +150,10 @@ var resizer = exports.resizer = function resizer(element, handle, options) {
         var directionX = 1,
             directionY = -1;
 
-        if (typeof options.invertedX === 'function' && options.invertedX()) {
+        if (typeof options.invertedX === "function" && options.invertedX()) {
             directionX = -1;
         }
-        if (typeof options.invertedY === 'function' && options.invertedY()) {
+        if (typeof options.invertedY === "function" && options.invertedY()) {
             directionY = 1;
         }
 
@@ -175,14 +178,13 @@ var resizer = exports.resizer = function resizer(element, handle, options) {
 
         // Did the element dimensions actually change? If not, then we've
         // reached the minimum size, and we shouldn't track
-        var didChange = ($el.height() !== height || $el.width() !== width);
+        var didChange = $el.height() !== height || $el.width() !== width;
         return didChange;
     }
 
     // We return the dragTracker object in order to expose its methods.
     return dragTracker(handle, resize);
-};
-
+});
 
 // mover is a component that uses a dragTracker under the hood to track the
 // dragging of a handle element, using that motion to move another element.
@@ -190,21 +192,20 @@ var resizer = exports.resizer = function resizer(element, handle, options) {
 // element - DOM Element to move
 // handle - DOM Element to use as a move handle
 //
-var mover = exports.mover = function mover(element, handle) {
+var mover = (exports.mover = function mover(element, handle) {
     function move(delta) {
         $(element).css({
-            top: parseInt($(element).css('top'), 10) + delta.y,
-            left: parseInt($(element).css('left'), 10) + delta.x
+            top: parseInt($(element).css("top"), 10) + delta.y,
+            left: parseInt($(element).css("left"), 10) + delta.x
         });
     }
 
     // We return the dragTracker object in order to expose its methods.
     return dragTracker(handle, move);
-};
-
+});
 
 // Public: Creates an element for editing annotations.
-var Editor = exports.Editor = Widget.extend({
+var Editor = (exports.Editor = Widget.extend({
     // Public: Creates an instance of the Editor object.
     //
     // options - An Object literal containing options.
@@ -223,7 +224,7 @@ var Editor = exports.Editor = Widget.extend({
     //   editor.load(annotation)
     //
     // Returns a new Editor instance.
-    constructor: function (options) {
+    constructor: function(options) {
         Widget.call(this, options);
 
         this.fields = [];
@@ -231,13 +232,17 @@ var Editor = exports.Editor = Widget.extend({
 
         if (this.options.defaultFields) {
             this.addField({
-                type: 'textarea',
-                label: _t('Comments') + '\u2026',
-                load: function (field, annotation) {
-                    $(field).find('textarea').val(annotation.text || '');
+                type: "textarea",
+                label: _t("Comments") + "\u2026",
+                load: function(field, annotation) {
+                    $(field)
+                        .find("textarea")
+                        .val(annotation.text || "");
                 },
-                submit: function (field, annotation) {
-                    annotation.text = $(field).find('textarea').val();
+                submit: function(field, annotation) {
+                    annotation.text = $(field)
+                        .find("textarea")
+                        .val();
                 }
             });
         }
@@ -245,24 +250,24 @@ var Editor = exports.Editor = Widget.extend({
         var self = this;
 
         this.element
-            .on("submit." + NS, 'form', function (e) {
+            .on("submit." + NS, "form", function(e) {
                 self._onFormSubmit(e);
             })
-            .on("click." + NS, '.annotator-save', function (e) {
+            .on("click." + NS, ".annotator-save", function(e) {
                 self._onSaveClick(e);
             })
-            .on("click." + NS, '.annotator-cancel', function (e) {
+            .on("click." + NS, ".annotator-cancel", function(e) {
                 self._onCancelClick(e);
             })
-            .on("mouseover." + NS, '.annotator-cancel', function (e) {
+            .on("mouseover." + NS, ".annotator-cancel", function(e) {
                 self._onCancelMouseover(e);
             })
-            .on("keydown." + NS, 'textarea', function (e) {
+            .on("keydown." + NS, "textarea", function(e) {
                 self._onTextareaKeydown(e);
             });
     },
 
-    destroy: function () {
+    destroy: function() {
         this.element.off("." + NS);
         Widget.prototype.destroy.call(this);
     },
@@ -279,17 +284,15 @@ var Editor = exports.Editor = Widget.extend({
     //   editor.show({top: '100px', left: '80px'})
     //
     // Returns nothing.
-    show: function (position) {
-        if (typeof position !== 'undefined' && position !== null) {
+    show: function(position) {
+        if (typeof position !== "undefined" && position !== null) {
             this.element.css({
                 top: position.top,
                 left: position.left
             });
         }
 
-        this.element
-            .find('.annotator-save')
-            .addClass(this.classes.focus);
+        this.element.find(".annotator-save").addClass(this.classes.focus);
 
         Widget.prototype.show.call(this);
 
@@ -307,7 +310,7 @@ var Editor = exports.Editor = Widget.extend({
     //
     // Returns a Promise that is resolved when the editor is submitted, or
     // rejected if editing is cancelled.
-    load: function (annotation, position) {
+    load: function(annotation, position) {
         this.annotation = annotation;
 
         for (var i = 0, len = this.fields.length; i < len; i++) {
@@ -316,8 +319,8 @@ var Editor = exports.Editor = Widget.extend({
         }
 
         var self = this;
-        return new Promise(function (resolve, reject) {
-            self.dfd = {resolve: resolve, reject: reject};
+        return new Promise(function(resolve, reject) {
+            self.dfd = { resolve: resolve, reject: reject };
             self.show(position);
         });
     },
@@ -325,12 +328,12 @@ var Editor = exports.Editor = Widget.extend({
     // Public: Submits the editor and saves any changes made to the annotation.
     //
     // Returns nothing.
-    submit: function () {
+    submit: function() {
         for (var i = 0, len = this.fields.length; i < len; i++) {
             var field = this.fields[i];
             field.submit(field.element, this.annotation);
         }
-        if (typeof this.dfd !== 'undefined' && this.dfd !== null) {
+        if (typeof this.dfd !== "undefined" && this.dfd !== null) {
             this.dfd.resolve();
         }
         this.hide();
@@ -340,9 +343,9 @@ var Editor = exports.Editor = Widget.extend({
     // annotation.
     //
     // Returns itself.
-    cancel: function () {
-        if (typeof this.dfd !== 'undefined' && this.dfd !== null) {
-            this.dfd.reject('editing cancelled');
+    cancel: function() {
+        if (typeof this.dfd !== "undefined" && this.dfd !== null) {
+            this.dfd.reject("editing cancelled");
         }
         this.hide();
     },
@@ -403,28 +406,34 @@ var Editor = exports.Editor = Widget.extend({
     //   })
     //
     // Returns the created <li> Element.
-    addField: function (options) {
-        var field = $.extend({
-            id: 'annotator-field-' + id(),
-            type: 'input',
-            label: '',
-            load: function () {},
-            submit: function () {}
-        }, options);
+    addField: function(options) {
+        var field = $.extend(
+            {
+                id: "annotator-field-" + id(),
+                type: "input",
+                label: "",
+                load: function() {},
+                submit: function() {}
+            },
+            options
+        );
 
         var input = null,
             element = $('<li class="annotator-item" />');
 
         field.element = element[0];
 
-        if (field.type === 'textarea') {
-            input = $('<textarea />');
-        } else if (field.type === 'checkbox') {
+        if (field.type === "textarea") {
+            input = $("<textarea />");
+        } else if (field.type === "checkbox") {
             input = $('<input type="checkbox" />');
-        } else if (field.type === 'input') {
-            input = $('<input />');
-        } else if (field.type === 'select') {
-            input = $('<select />');
+        } else if (field.type === "input") {
+            input = $(`<input ${options.class ? `class="${options.class}"` : ""}/>`);
+        } else if (field.type === "select") {
+            input = $(`<select name="tags[]" multiple="multiple"/>`);
+            if (options.selectOptions) options.selectOptions.forEach(option =>
+                input.append($(`<option value=${option}>${option}</option>`))
+            );
         }
 
         element.append(input);
@@ -434,29 +443,31 @@ var Editor = exports.Editor = Widget.extend({
             placeholder: field.label
         });
 
-        if (field.type === 'checkbox') {
-            element.addClass('annotator-checkbox');
-            element.append($('<label />', {
-                'for': field.id,
-                'html': field.label
-            }));
+        if (field.type === "checkbox") {
+            element.addClass("annotator-checkbox");
+            element.append(
+                $("<label />", {
+                    for: field.id,
+                    html: field.label
+                })
+            );
         }
 
-        this.element.find('ul:first').append(element);
+        this.element.find("ul:first").append(element);
         this.fields.push(field);
 
         return field.element;
     },
 
-    checkOrientation: function () {
+    checkOrientation: function() {
         Widget.prototype.checkOrientation.call(this);
 
-        var list = this.element.find('ul').first(),
-            controls = this.element.find('.annotator-controls');
+        var list = this.element.find("ul").first(),
+            controls = this.element.find(".annotator-controls");
 
         if (this.element.hasClass(this.classes.invert.y)) {
             controls.insertBefore(list);
-        } else if (controls.is(':first-child')) {
+        } else if (controls.is(":first-child")) {
             controls.insertAfter(list);
         }
 
@@ -467,7 +478,7 @@ var Editor = exports.Editor = Widget.extend({
     // return, for example).
     //
     // Returns nothing
-    _onFormSubmit: function (event) {
+    _onFormSubmit: function(event) {
         preventEventDefault(event);
         this.submit();
     },
@@ -475,7 +486,7 @@ var Editor = exports.Editor = Widget.extend({
     // Event callback: called when a user clicks the editor's save button.
     //
     // Returns nothing
-    _onSaveClick: function (event) {
+    _onSaveClick: function(event) {
         preventEventDefault(event);
         this.submit();
     },
@@ -483,7 +494,7 @@ var Editor = exports.Editor = Widget.extend({
     // Event callback: called when a user clicks the editor's cancel button.
     //
     // Returns nothing
-    _onCancelClick: function (event) {
+    _onCancelClick: function(event) {
         preventEventDefault(event);
         this.cancel();
     },
@@ -492,9 +503,9 @@ var Editor = exports.Editor = Widget.extend({
     // button.
     //
     // Returns nothing
-    _onCancelMouseover: function () {
+    _onCancelMouseover: function() {
         this.element
-            .find('.' + this.classes.focus)
+            .find("." + this.classes.focus)
             .removeClass(this.classes.focus);
     },
 
@@ -505,7 +516,7 @@ var Editor = exports.Editor = Widget.extend({
     // event - A keydown Event object.
     //
     // Returns nothing
-    _onTextareaKeydown: function (event) {
+    _onTextareaKeydown: function(event) {
         if (event.which === 27) {
             // "Escape" key => abort.
             this.cancel();
@@ -518,50 +529,50 @@ var Editor = exports.Editor = Widget.extend({
     // Sets up mouse events for resizing and dragging the editor window.
     //
     // Returns nothing.
-    _setupDraggables: function () {
-        if (typeof this._resizer !== 'undefined' && this._resizer !== null) {
+    _setupDraggables: function() {
+        if (typeof this._resizer !== "undefined" && this._resizer !== null) {
             this._resizer.destroy();
         }
-        if (typeof this._mover !== 'undefined' && this._mover !== null) {
+        if (typeof this._mover !== "undefined" && this._mover !== null) {
             this._mover.destroy();
         }
 
-        this.element.find('.annotator-resize').remove();
+        this.element.find(".annotator-resize").remove();
 
         // Find the first/last item element depending on orientation
         var cornerItem;
         if (this.element.hasClass(this.classes.invert.y)) {
-            cornerItem = this.element.find('.annotator-item:last');
+            cornerItem = this.element.find(".annotator-item:last");
         } else {
-            cornerItem = this.element.find('.annotator-item:first');
+            cornerItem = this.element.find(".annotator-item:first");
         }
 
         if (cornerItem) {
             $('<span class="annotator-resize"></span>').appendTo(cornerItem);
         }
 
-        var controls = this.element.find('.annotator-controls')[0],
-            textarea = this.element.find('textarea:first')[0],
-            resizeHandle = this.element.find('.annotator-resize')[0],
+        var controls = this.element.find(".annotator-controls")[0],
+            textarea = this.element.find("textarea:first")[0],
+            resizeHandle = this.element.find(".annotator-resize")[0],
             self = this;
 
         this._resizer = resizer(textarea, resizeHandle, {
-            invertedX: function () {
+            invertedX: function() {
                 return self.element.hasClass(self.classes.invert.x);
             },
-            invertedY: function () {
+            invertedY: function() {
                 return self.element.hasClass(self.classes.invert.y);
             }
         });
 
         this._mover = mover(this.element[0], controls);
     }
-});
+}));
 
 // Classes to toggle state.
 Editor.classes = {
-    hide: 'annotator-hide',
-    focus: 'annotator-focus'
+    hide: "annotator-hide",
+    focus: "annotator-focus"
 };
 
 // HTML template for this.element.
@@ -570,13 +581,13 @@ Editor.template = [
     '  <form class="annotator-widget">',
     '    <ul class="annotator-listing"></ul>',
     '    <div class="annotator-controls">',
-    '     <a href="#cancel" class="annotator-cancel">' + _t('Cancel') + '</a>',
+    '     <a href="#cancel" class="annotator-cancel">' + _t("Cancel") + "</a>",
     '      <a href="#save"',
-    '         class="annotator-save annotator-focus">' + _t('Save') + '</a>',
-    '    </div>',
-    '  </form>',
-    '</div>'
-].join('\n');
+    '         class="annotator-save annotator-focus">' + _t("Save") + "</a>",
+    "    </div>",
+    "  </form>",
+    "</div>"
+].join("\n");
 
 // Configuration options
 Editor.options = {
@@ -591,11 +602,13 @@ exports.standalone = function standalone(options) {
     var widget = new exports.Editor(options);
 
     return {
-        destroy: function () { widget.destroy(); },
-        beforeAnnotationCreated: function (annotation) {
+        destroy: function() {
+            widget.destroy();
+        },
+        beforeAnnotationCreated: function(annotation) {
             return widget.load(annotation);
         },
-        beforeAnnotationUpdated: function (annotation) {
+        beforeAnnotationUpdated: function(annotation) {
             return widget.load(annotation);
         }
     };

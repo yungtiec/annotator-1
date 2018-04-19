@@ -276,7 +276,7 @@ function main(options) {
         });
         s.viewer.attach();
 
-        injectDynamicStyle();
+        // injectDynamicStyle();
     }
 
     return {

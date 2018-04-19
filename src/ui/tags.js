@@ -75,7 +75,7 @@ exports.viewerExtension = function viewerExtension(v) {
  *         viewerExtensions: [annotator.ui.tags.viewerExtension]
  *     })
  */
-exports.editorExtension = function editorExtension(e) {
+exports.editorExtension = function editorExtension(options, editor) {
     // The input element added to the Annotator.Editor wrapped in jQuery.
     // Cached to save having to recreate it everytime the editor is displayed.
     var field = null;
@@ -93,10 +93,11 @@ exports.editorExtension = function editorExtension(e) {
         annotation.tags = parseTags(input.val());
     }
 
-    field = e.addField({
-        label: _t('Add some tags here') + '\u2026',
+    field = editor.addField({
+        label: _t('Add some tags here (separate by space)') + '\u2026',
         load: updateField,
-        submit: setAnnotationTags
+        submit: setAnnotationTags,
+        ...options
     });
 
     input = $(field).find(':input');
