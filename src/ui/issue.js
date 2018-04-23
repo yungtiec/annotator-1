@@ -19,7 +19,7 @@ var _t = util.gettext;
  *         viewerExtensions: [annotator.ui.tags.viewerExtension]
  *     })
  */
-exports.editorExtension = function editorExtension(options, editor) {
+exports.editorExtension = function editorExtension(editor) {
     // The input element added to the Annotator.Editor wrapped in jQuery.
     // Cached to save having to recreate it everytime the editor is displayed.
     var field = null;
@@ -38,7 +38,7 @@ exports.editorExtension = function editorExtension(options, editor) {
         id: 'annotator-field-issue',
         load: updateField,
         submit: setIssueBoolean,
-        ...options
+        type: 'checkbox'
     });
 
     checkbox = $(field).find(':checkbox');
