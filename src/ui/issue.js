@@ -26,20 +26,19 @@ exports.editorExtension = function editorExtension(editor) {
     var checkbox = null;
 
     function updateField(field, annotation) {
-        checkbox.val(true);
+        annotation.issue = false;
     }
 
     function setIssueBoolean(field, annotation) {
-        annotation.issue = checkbox.val();
+        annotation.issue = checkbox.is(":checked");
     }
 
     field = editor.addField({
-        label: _t('Open an issue?') + '\u2026',
-        id: 'annotator-field-issue',
-        load: updateField,
+        label: _t("Open an issue?") + "\u2026",
+        id: "annotator-field-issue",
         submit: setIssueBoolean,
-        type: 'checkbox'
+        type: "checkbox"
     });
 
-    checkbox = $(field).find(':checkbox');
+    checkbox = $(field).find(":checkbox");
 };
