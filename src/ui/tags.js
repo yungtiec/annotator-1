@@ -1,7 +1,7 @@
 /*package annotator.ui.tags */
 "use strict";
 
-var util = require('../util');
+var util = require("../util");
 
 var $ = util.$;
 var _t = util.gettext;
@@ -25,7 +25,6 @@ function parseTags(string) {
     return tags;
 }
 
-
 /**
  * function:: viewerExtension(viewer)
  *
@@ -41,15 +40,19 @@ function parseTags(string) {
 exports.viewerExtension = function viewerExtension(v) {
     function updateViewer(field, annotation) {
         field = $(field);
-        if (annotation.tags &&
+        if (
+            annotation.tags &&
             $.isArray(annotation.tags) &&
-            annotation.tags.length) {
-            field.addClass('annotator-tags').html(function () {
-                return $.map(annotation.tags, function (tag) {
-                    return '<span class="annotator-tag">' +
+            annotation.tags.length
+        ) {
+            field.addClass("annotator-tags").html(function() {
+                return $.map(annotation.tags, function(tag) {
+                    return (
+                        '<span class="annotator-tag">' +
                         util.escapeHtml(tag) +
-                        '</span>';
-                }).join(' ');
+                        "</span>"
+                    );
+                }).join(" ");
             });
         } else {
             field.remove();
@@ -60,7 +63,6 @@ exports.viewerExtension = function viewerExtension(v) {
         load: updateViewer
     });
 };
-
 
 /**
  * function:: editorExtension(editor)
@@ -82,23 +84,32 @@ exports.editorExtension = function editorExtension(options, editor) {
     var input = null;
 
     function updateField(field, annotation) {
-        var value = '';
-        if (annotation.tags) {
-            value = stringifyTags(annotation.tags);
-        }
-        input.val(value);
+        input.val("");
+        $(".tagsinput .tag").remove();
+        $(".ui-autocomplete-input").val("");
+        $(".ui-autocomplete-input").attr(
+            "placeholder",
+            "Enter tag and press return"
+        );
     }
 
     function setAnnotationTags(field, annotation) {
         annotation.tags = parseTags(input.val());
+        input.val("");
+        $(".tagsinput .tag").remove();
+        $(".ui-autocomplete-input").val("");
+        $(".ui-autocomplete-input").attr(
+            "placeholder",
+            "Enter tag and press return"
+        );
     }
 
     field = editor.addField({
-        label: _t('Add some tags here (separate by space)') + '\u2026',
+        label: _t("Add some tags here (separate by space)") + "\u2026",
         load: updateField,
         submit: setAnnotationTags,
         ...options
     });
 
-    input = $(field).find(':input');
+    input = $(field).find(":input");
 };

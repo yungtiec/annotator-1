@@ -1,7 +1,7 @@
 /*package annotator.ui.issue */
 "use strict";
 
-var util = require('../util');
+var util = require("../util");
 
 var $ = util.$;
 var _t = util.gettext;
@@ -29,13 +29,19 @@ exports.editorExtension = function editorExtension(editor) {
         annotation.issue = false;
     }
 
+    function resetCheckbox() {
+        checkbox.prop("checked", false);
+    }
+
     function setIssueBoolean(field, annotation) {
         annotation.issue = checkbox.is(":checked");
+        checkbox.prop("checked", false);
     }
 
     field = editor.addField({
         label: _t("Open an issue?") + "\u2026",
         id: "annotator-field-issue",
+        load: resetCheckbox,
         submit: setIssueBoolean,
         type: "checkbox"
     });
