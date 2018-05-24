@@ -104,12 +104,16 @@ exports.editorExtension = function editorExtension(options, editor) {
         );
     }
 
-    field = editor.addField({
-        label: _t("Add some tags here (separate by space)") + "\u2026",
-        load: updateField,
-        submit: setAnnotationTags,
-        ...options
-    });
+    field = editor.addField(
+        Object.assign(
+            {
+                label: _t("Add some tags here (separate by space)") + "\u2026",
+                load: updateField,
+                submit: setAnnotationTags
+            },
+            options
+        )
+    );
 
     input = $(field).find(":input");
 };
