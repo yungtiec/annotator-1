@@ -38,13 +38,13 @@ exports.editorExtension = function editorExtension(editor) {
         checkbox.prop("checked", false);
     }
 
-    field = editor.addField({
-        label: _t("Open an issue?") + "\u2026",
-        id: "annotator-field-issue",
-        load: resetCheckbox,
-        submit: setIssueBoolean,
-        type: "checkbox"
-    });
+    // field = editor.addField({
+    //     label: _t("Open an issue?") + "\u2026",
+    //     id: "annotator-field-issue",
+    //     load: resetCheckbox,
+    //     submit: setIssueBoolean,
+    //     type: "checkbox"
+    // });
 
-    checkbox = $(field).find(":checkbox");
+    // checkbox = $(field).find(":checkbox");
 };
