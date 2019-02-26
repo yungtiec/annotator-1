@@ -17,10 +17,7 @@ function stringifyTags(array) {
 function parseTags(string) {
     string = $.trim(string);
     var tags = [];
-
-    if (string) {
-        tags = string.split(/\s+/);
-    }
+    tags = string.split(";");
 
     return tags;
 }
@@ -85,35 +82,35 @@ exports.editorExtension = function editorExtension(options, editor) {
 
     function updateField(field, annotation) {
         input.val("");
-        // $(".tagsinput .tag").remove();
-        // $(".ui-autocomplete-input").val("");
-        // $(".ui-autocomplete-input").attr(
-        //     "placeholder",
-        //     "Enter tag and press return"
-        // );
+        $(".tagsinput .tag").remove();
+        $(".ui-autocomplete-input").val("");
+        $(".ui-autocomplete-input").attr(
+            "placeholder",
+            "Enter tag and press return"
+        );
     }
 
     function setAnnotationTags(field, annotation) {
-        // annotation.tags = parseTags(input.val());
+        annotation.tags = parseTags(input.val());
         input.val("");
-        // $(".tagsinput .tag").remove();
-        // $(".ui-autocomplete-input").val("");
-        // $(".ui-autocomplete-input").attr(
-        //     "placeholder",
-        //     "Enter tag and press return"
-        // );
+        $(".tagsinput .tag").remove();
+        $(".ui-autocomplete-input").val("");
+        $(".ui-autocomplete-input").attr(
+            "placeholder",
+            "Enter tag and press return"
+        );
     }
 
-    // field = editor.addField(
-    //     Object.assign(
-    //         {
-    //             label: _t("Add some tags here (separate by space)") + "\u2026",
-    //             load: updateField,
-    //             submit: setAnnotationTags
-    //         },
-    //         options
-    //     )
-    // );
+    field = editor.addField(
+        Object.assign(
+            {
+                label: _t("Add some tags here (separate by space)") + "\u2026",
+                load: updateField,
+                submit: setAnnotationTags
+            },
+            options
+        )
+    );
 
     input = $(field).find(":input");
 };
