@@ -91,7 +91,8 @@ exports.editorExtension = function editorExtension(options, editor) {
     }
 
     function setAnnotationTags(field, annotation) {
-        annotation.tags = parseTags(input.val());
+        var rawTags = parseTags(input.val());
+        annotation.tags = rawTags.filter(t => !!t);
         input.val("");
         $(".tagsinput .tag").remove();
         $(".ui-autocomplete-input").val("");
